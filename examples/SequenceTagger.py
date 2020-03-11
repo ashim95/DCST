@@ -19,7 +19,7 @@ from torch.optim import Adam, SGD
 from utils.io_ import seeds, Writer, get_logger, Index2Instance, prepare_data, write_extra_labels
 from utils.models.sequence_tagger import Sequence_Tagger
 from utils import load_word_embeddings
-from utils.tasks.seqeval import accuracy_score, f1_score, precision_score, recall_score
+from utils.tasks.seqeval import accuracy_score, f1_score, precision_score, recall_score,classification_report
 
 uid = uuid.uuid4().hex[:6]
 
@@ -31,7 +31,10 @@ def read_arguments():
     args_.add_argument('--domain', help='domain', required=True)
     args_.add_argument('--rnn_mode', choices=['RNN', 'LSTM', 'GRU'], help='architecture of rnn',
                        required=True)
-    args_.add_argument('--task', default='distance_from_the_root', choices=['distance_from_the_root', 'number_of_children', 'relative_pos_based', 'language_model'], help='sequence_tagger task')
+    args_.add_argument('--task', default='distance_from_the_root', choices=['distance_from_the_root', 'number_of_children',\
+     'relative_pos_based', 'language_model','add_label','add_head_coarse_pos','Multitask_POS_predict','Multitask_case_predict',\
+     'Multitask_label_predict','Multitask_coarse_predict',\
+     'predict_coarse_of_modifier','predict_ma_tag_of_modifier','add_head_ma','predict_case_of_modifier'], help='sequence_tagger task')
     args_.add_argument('--num_epochs', type=int, default=200, help='Number of training epochs')
     args_.add_argument('--batch_size', type=int, default=64, help='Number of sentences in each batch')
     args_.add_argument('--hidden_size', type=int, default=256, help='Number of hidden units in RNN')
@@ -64,9 +67,12 @@ def read_arguments():
                        help='Embedding for words')
     args_.add_argument('--word_path', help='path for word embedding dict - in case word_embedding is not random')
     args_.add_argument('--freeze_word_embeddings', action='store_true', help='frozen the word embedding (disable fine-tuning).')
-    args_.add_argument('--char_embedding', choices=['random'], help='Embedding for characters',
+    args_.add_argument('--char_embedding', choices=['random','hellwig'], help='Embedding for characters',
+                       required=True)
+    args_.add_argument('--pos_embedding', choices=['random','one_hot'], help='Embedding for pos',
                        required=True)
     args_.add_argument('--char_path', help='path for character embedding dict')
+    args_.add_argument('--pos_path', help='path for pos embedding dict')
     args_.add_argument('--use_unlabeled_data', action='store_true', help='flag to use unlabeled data.')
     args_.add_argument('--use_labeled_data', action='store_true', help='flag to use labeled data.')
     args_.add_argument('--model_path', help='path for saving model file.', required=True)
@@ -99,8 +105,52 @@ def read_arguments():
         args_dict['data_paths'] = write_extra_labels.add_distance_from_the_root(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'Multitask_label_predict':
+        args_dict['data_paths'] = write_extra_labels.Multitask_label_predict(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'Multitask_coarse_predict':
+        args_dict['data_paths'] = write_extra_labels.Multitask_coarse_predict(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'Multitask_POS_predict':
+        args_dict['data_paths'] = write_extra_labels.Multitask_POS_predict(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                use_labeled_data=args_dict['use_labeled_data'])
     elif args_dict['task'] == 'relative_pos_based':
         args_dict['data_paths'] = write_extra_labels.add_relative_pos_based(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'add_label':
+        args_dict['data_paths'] = write_extra_labels.add_label(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'add_relative_TAG':
+        args_dict['data_paths'] = write_extra_labels.add_relative_TAG(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'add_head_coarse_pos':
+        args_dict['data_paths'] = write_extra_labels.add_head_coarse_pos(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'predict_ma_tag_of_modifier':
+        args_dict['data_paths'] = write_extra_labels.predict_ma_tag_of_modifier(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'Multitask_case_predict':
+        args_dict['data_paths'] = write_extra_labels.Multitask_case_predict(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'predict_coarse_of_modifier':
+        args_dict['data_paths'] = write_extra_labels.predict_coarse_of_modifier(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'predict_case_of_modifier':
+        args_dict['data_paths'] = write_extra_labels.predict_case_of_modifier(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
+                                                                                 use_unlabeled_data=args_dict['use_unlabeled_data'],
+                                                                                 use_labeled_data=args_dict['use_labeled_data'])
+    elif args_dict['task'] == 'add_head_ma':
+        args_dict['data_paths'] = write_extra_labels.add_head_ma(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
                                                                                  use_unlabeled_data=args_dict['use_unlabeled_data'],
                                                                                  use_labeled_data=args_dict['use_labeled_data'])
     else: #args_dict['task'] == 'language_model':
@@ -153,7 +203,9 @@ def read_arguments():
     args_dict['word_path'] = args.word_path
     args_dict['use_char'] = args.use_char
     args_dict['char_embedding'] = args.char_embedding
+    args_dict['pos_embedding'] = args.pos_embedding
     args_dict['char_path'] = args.char_path
+    args_dict['pos_path'] = args.pos_path
     args_dict['use_pos'] = args.use_pos
     args_dict['pos_dim'] = args.pos_dim
     args_dict['word_dict'] = None
@@ -167,6 +219,9 @@ def read_arguments():
         args_dict['char_dict'], args_dict['char_dim'] = load_word_embeddings.load_embedding_dict(args_dict['char_embedding'],
                                                                                                  args_dict['char_path'])
     args_dict['pos_dict'] = None
+    if args_dict['pos_embedding'] != 'random':
+        args_dict['pos_dict'], args_dict['pos_dim'] = load_word_embeddings.load_embedding_dict(args_dict['pos_embedding'],
+                                                                                                 args_dict['pos_path'])
     args_dict['alphabet_path'] = path.join(args_dict['model_path'], 'alphabets' + '_src_domain_' + args_dict['domain'] + '/')
     args_dict['alphabet_parser_path'] = path.join(args_dict['parser_path'], 'alphabets' + '_src_domain_' + args_dict['domain'] + '/')
     args_dict['model_name'] = path.join(args_dict['model_path'], args_dict['model_name'])
@@ -323,7 +378,7 @@ def in_domain_evaluation(args, datasets, model, optimizer, dev_eval_dict, test_e
         save_checkpoint(best_model, best_optimizer, args.opt, dev_eval_dict, test_eval_dict, args.full_model_name)
 
     print('\n')
-    return dev_eval_dict, test_eval_dict, best_model, best_optimizer, patient
+    return dev_eval_dict, test_eval_dict, best_model, best_optimizer, patient, curr_dev_eval_dict
 
 
 def evaluation(args, data, split, model, domain, epoch, str_res='results'):
@@ -353,6 +408,7 @@ def evaluation(args, data, split, model, domain, epoch, str_res='results'):
     eval_dict['auto_label_precision'] = precision_score(gold_labels, pred_labels) * 100
     eval_dict['auto_label_recall'] = recall_score(gold_labels, pred_labels) * 100
     eval_dict['auto_label_f1'] = f1_score(gold_labels, pred_labels) * 100
+    eval_dict['classification_report'] = classification_report(gold_labels, pred_labels)
     print_results(eval_dict, split, domain, str_res)
     return eval_dict
 
@@ -365,6 +421,7 @@ def print_results(eval_dict, split, domain, str_res='results'):
         str_res + ' on ' + split + ' accuracy: %.2f%%, precision: %.2f%%, recall: %.2f%%, F1: %.2f%% (epoch: %d)'
         % (eval_dict['auto_label_accuracy'], eval_dict['auto_label_precision'], eval_dict['auto_label_recall'], eval_dict['auto_label_f1'],
            eval_dict['epoch']))
+    print(eval_dict['classification_report'])
 
 
 def write_results(args, data, data_domain, split, model, model_domain, eval_dict):
@@ -475,7 +532,12 @@ def main():
             print('train: %d/%d, domain: %s, total_loss: %.2f, time: %.2fs' %
                   (batch_num, num_batches, args.domain, total_loss / total_train_inst, time.time() - start_time))
 
-            dev_eval_dict, test_eval_dict, best_model, best_optimizer, patient = in_domain_evaluation(args, datasets, model, optimizer, dev_eval_dict, test_eval_dict, epoch, best_model, best_optimizer, patient)
+            dev_eval_dict, test_eval_dict, best_model, best_optimizer, patient,curr_dev_eval_dict = in_domain_evaluation(args, datasets, model, optimizer, dev_eval_dict, test_eval_dict, epoch, best_model, best_optimizer, patient)
+            store ={'dev_eval_dict':curr_dev_eval_dict }
+            ############################################# 
+            str_file = args.full_model_name + '_' +'all_epochs'
+            with open(str_file,'a') as f:
+                f.write(str(store)+'\n')
             if patient == 0:
                 terminal_patient = 0
             else:

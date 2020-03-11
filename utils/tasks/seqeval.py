@@ -125,7 +125,9 @@ def f1_score(y_true, y_pred, average='micro', suffix=False):
         >>> y_pred = [['O', 'O', 'B-MISC', 'I-MISC', 'I-MISC', 'I-MISC', 'O'], ['B-PER', 'I-PER', 'O']]
         >>> f1_score(y_true, y_pred)
         0.50
-    """
+    # """
+    # from sklearn.metrics import f1_score
+    # score = f1_score(y_true, y_pred, average='macro')
     true_entities = set(get_entities(y_true, suffix))
     pred_entities = set(get_entities(y_pred, suffix))
 

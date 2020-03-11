@@ -68,9 +68,12 @@ def read_arguments():
     args_.add_argument('--word_path', help='path for word embedding dict - in case word_embedding is not random')
     args_.add_argument('--freeze_word_embeddings', action='store_true', help='frozen the word embedding (disable fine-tuning).')
     args_.add_argument('--freeze_sequence_taggers', action='store_true', help='frozen the BiLSTMs of the pre-trained taggers.')
-    args_.add_argument('--char_embedding', choices=['random'], help='Embedding for characters',
+    args_.add_argument('--char_embedding', choices=['random','hellwig'], help='Embedding for characters',
+                       required=True)
+    args_.add_argument('--pos_embedding', choices=['random','one_hot'], help='Embedding for pos',
                        required=True)
     args_.add_argument('--char_path', help='path for character embedding dict')
+    args_.add_argument('--pos_path', help='path for pos embedding dict')
     args_.add_argument('--set_num_training_samples', type=int, help='downsampling training set to a fixed number of samples')
     args_.add_argument('--model_path', help='path for saving model file.', required=True)
     args_.add_argument('--load_path', help='path for loading saved source model file.', default=None)
@@ -152,6 +155,8 @@ def read_arguments():
     args_dict['use_char'] = args.use_char
     args_dict['char_embedding'] = args.char_embedding
     args_dict['char_path'] = args.char_path
+    args_dict['pos_embedding'] = args.pos_embedding
+    args_dict['pos_path'] = args.pos_path
     args_dict['use_pos'] = args.use_pos
     args_dict['pos_dim'] = args.pos_dim
     args_dict['word_dict'] = None
@@ -165,6 +170,9 @@ def read_arguments():
         args_dict['char_dict'], args_dict['char_dim'] = load_word_embeddings.load_embedding_dict(args_dict['char_embedding'],
                                                                                                  args_dict['char_path'])
     args_dict['pos_dict'] = None
+    if args_dict['pos_embedding'] != 'random':
+        args_dict['pos_dict'], args_dict['pos_dim'] = load_word_embeddings.load_embedding_dict(args_dict['pos_embedding'],
+                                                                                                 args_dict['pos_path'])
     args_dict['alphabet_path'] = path.join(args_dict['model_path'], 'alphabets' + '_src_domain_' + args_dict['domain'] + '/')
     args_dict['model_name'] = path.join(args_dict['model_path'], args_dict['model_name'])
     args_dict['eval_mode'] = args.eval_mode

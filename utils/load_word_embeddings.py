@@ -70,6 +70,42 @@ def load_embedding_dict(embedding, embedding_path, lower_case=False):
             if len(v) != embedd_dim:
                 print(len(v),embedd_dim)
 
+    elif embedding == 'hellwig':
+        # loading hellwig
+        embedd_dict = {}
+        word = None
+        with io.open(embedding_path, 'r', encoding='utf-8') as f:
+            # skip first line
+            for i, line in enumerate(f):
+                if i == 0:
+                    continue
+                word, vec = line.split(' ', 1)
+                embedd_dict[word] = np.fromstring(vec, sep=' ')
+        embedd_dim = len(embedd_dict[word])
+        if lower_case:
+            embedd_dict = calc_mean_vec_for_lower_mapping(embedd_dict)
+        for k, v in embedd_dict.items():
+            if len(v) != embedd_dim:
+                print(len(v),embedd_dim)
+
+    elif embedding == 'one_hot':
+        # loading hellwig
+        embedd_dict = {}
+        word = None
+        with io.open(embedding_path, 'r', encoding='utf-8') as f:
+            # skip first line
+            for i, line in enumerate(f):
+                if i == 0:
+                    continue
+                word, vec = line.split('@', 1)
+                embedd_dict[word] = np.fromstring(vec, sep=' ')
+        embedd_dim = len(embedd_dict[word])
+        if lower_case:
+            embedd_dict = calc_mean_vec_for_lower_mapping(embedd_dict)
+        for k, v in embedd_dict.items():
+            if len(v) != embedd_dim:
+                print(len(v),embedd_dim)
+
     elif embedding == 'word2vec':
         # loading word2vec
         embedd_dict = KeyedVectors.load_word2vec_format(embedding_path, binary=True)
