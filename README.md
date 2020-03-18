@@ -1,16 +1,17 @@
 Official code for the paper ["Deep Contextualized Self-training for Low Resource Dependency Parsing"](https://www.mitpressjournals.org/doi/pdf/10.1162/tacl_a_00294).\
 If you use this code please cite our paper.
 
-# Requirements
+## Requirements
 Simply run:
-Python 3.7 \
-Pytorch 1.1.0 \
-Cuda 10.0 \
+
+* Python 3.7 \
+* Pytorch 1.1.0 \
+* Cuda 10.0 
 
 ```
 pip install -r requirements.txt
 ```
-# Data
+## Data
 Preprocessed in `note` format.
 
 ## Multilingual Word Embeddings
@@ -19,7 +20,7 @@ Possible word embedding option: ['random', 'fasttext'] \
 The multilingual word embedding (.vec extensions) should be placed under the `data/multilingual_word_embeddings` folder.
 
 
-# Low Resource In-domain Experiments
+## Low Resource In-domain Experiments
 In order to run the low resource in-domain experiments there are three steps we need to follow:
 1. Running the base Biaffine parser
 2. Running the sequence tagger(s)
@@ -33,6 +34,9 @@ Refer to corrsoponding section in `run_dcsh.sh` to run corrsopnding segments.
 1. Without POS Tag       : Don't use flag `--use_pos` for all stages, namely, base model, auxiliary tasks, Final ensembled model.
 2. With Coarse level Tag : Use the input files from `data` folder from [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing) 
 3. With POS level Tag    : Shuffle 2nd and 3rd column of all the files in  `data` folder.
+
+## Mode : Average
+Set the `word_path="./data/cc.sanskrit.300.case.nos.vec"` or `cc.sanskrit.300.FT.case.nos.vec` or `cc.sanskrit.300.case.vec`. These files can be found [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing)
 
 ## Running the base Biaffine Parser
 Note that to run BiAFF classifier on 500 training data set `--set_num_training_samples 500`. And if you want to train on complete trainind data remove this flag. 
