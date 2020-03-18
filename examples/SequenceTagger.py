@@ -97,6 +97,7 @@ def read_arguments():
     args_dict['full_model_name'] = path.join(args_dict['model_path'],args_dict['model_name'])
     args_dict['use_unlabeled_data'] = args.use_unlabeled_data
     args_dict['use_labeled_data'] = args.use_labeled_data
+    print(args_dict['parser_path'])
     if args_dict['task'] == 'number_of_children':
         args_dict['data_paths'] = write_extra_labels.add_number_of_children(args_dict['model_path'], args_dict['parser_path'], args_dict['domain'], args_dict['domain'],
                                                                             use_unlabeled_data=args_dict['use_unlabeled_data'],

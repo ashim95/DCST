@@ -20,11 +20,11 @@ def add_number_of_children(model_path, parser_path, src_domain, tgt_domain, use_
     if src_domain == tgt_domain:
         pred_paths = []
         if use_unlabeled_data:
-            pred_paths = [file for file in os.listdir(parser_path) if file.endswith("pred.txt") and 'extra' in file and tgt_domain in file]
+            pred_paths = [file for file in os.listdir(parser_path) if file.endswith("pred.txt") and 'poetry' not in file and 'prose' not in file and 'extra' in file and tgt_domain in file]
 
-        gold_paths = [file for file in os.listdir(parser_path) if file.endswith("gold.txt") and 'extra' not in file and tgt_domain in file and 'train' not in file]
+        gold_paths = [file for file in os.listdir(parser_path) if file.endswith("gold.txt") and 'poetry' not in file and 'prose' not in file  and 'extra' not in file and tgt_domain in file and 'train' not in file]
         if use_labeled_data:
-            gold_paths += [file for file in os.listdir(parser_path) if file.endswith("gold.txt") and 'extra' not in file and tgt_domain in file and 'train' in file]
+            gold_paths += [file for file in os.listdir(parser_path) if file.endswith("gold.txt") and 'poetry' not in file and 'prose' not in file and 'extra' not in file and tgt_domain in file and 'train' in file]
 
         if not use_unlabeled_data and not use_labeled_data:
             raise ValueError
@@ -121,13 +121,13 @@ def add_distance_from_the_root(model_path, parser_path, src_domain, tgt_domain, 
         pred_paths = []
         if use_unlabeled_data:
             pred_paths = [file for file in os.listdir(parser_path) if
-                          file.endswith("pred.txt") and 'extra' in file and tgt_domain in file]
+                          file.endswith("pred.txt") and 'poetry' not in file and 'prose' not in file  and 'extra' in file and tgt_domain in file]
 
         gold_paths = [file for file in os.listdir(parser_path) if
-                      file.endswith("gold.txt") and 'extra' not in file and tgt_domain in file and 'train' not in file]
+                      file.endswith("gold.txt") and 'poetry' not in file and 'prose' not in file  and 'extra' not in file and tgt_domain in file and 'train' not in file]
         if use_labeled_data:
             gold_paths += [file for file in os.listdir(parser_path) if
-                           file.endswith("gold.txt") and 'extra' not in file and tgt_domain in file and 'train' in file]
+                           file.endswith("gold.txt") and 'extra' not in file and 'poetry' not in file and 'prose' not in file and tgt_domain in file and 'train' in file]
 
         if not use_unlabeled_data and not use_labeled_data:
             raise ValueError
@@ -244,13 +244,13 @@ def add_relative_pos_based(model_path, parser_path, src_domain, tgt_domain, use_
         pred_paths = []
         if use_unlabeled_data:
             pred_paths = [file for file in os.listdir(parser_path) if
-                          file.endswith("pred.txt") and 'extra' in file and tgt_domain in file]
+                          file.endswith("pred.txt") and 'poetry' not in file and 'prose' not in file  and 'extra' in file and tgt_domain in file]
 
         gold_paths = [file for file in os.listdir(parser_path) if
-                      file.endswith("gold.txt") and 'extra' not in file and tgt_domain in file and 'train' not in file]
+                      file.endswith("gold.txt") and 'poetry' not in file and 'prose' not in file  and 'extra' not in file and tgt_domain in file and 'train' not in file]
         if use_labeled_data:
             gold_paths += [file for file in os.listdir(parser_path) if
-                           file.endswith("gold.txt") and 'extra' not in file and tgt_domain in file and 'train' in file]
+                           file.endswith("gold.txt") and 'extra' not in file and 'poetry' not in file and 'prose' not in file and tgt_domain in file and 'train' in file]
 
         if not use_unlabeled_data and not use_labeled_data:
             raise ValueError

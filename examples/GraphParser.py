@@ -89,7 +89,8 @@ def read_arguments():
     args_dict['gating'] = args.gating
     args_dict['num_gates'] = args.num_gates
     args_dict['arc_decode'] = args.arc_decode
-    args_dict['splits'] = ['train', 'dev', 'test']
+    # args_dict['splits'] = ['train', 'dev', 'test']
+    args_dict['splits'] = ['train', 'dev', 'test','poetry','prose']
     args_dict['model_path'] = args.model_path
     if not path.exists(args_dict['model_path']):
         makedirs(args_dict['model_path'])
@@ -100,7 +101,10 @@ def read_arguments():
         data_path = 'data/ud_pos_ner_dp'
     for split in args_dict['splits']:
         args_dict['data_paths'][split] = data_path + '_' + split + '_' + args_dict['domain']
-
+    ###################################    
+    args_dict['data_paths']['poetry'] = 'data/Shishu_300' + '_' + 'poetry' + '_' + args_dict['domain']
+    args_dict['data_paths']['prose'] = 'data/Shishu_300' + '_' + 'prose' + '_' + args_dict['domain']
+    ###################################
     args_dict['alphabet_data_paths'] = {}
     for split in args_dict['splits']:
         if args_dict['dataset'] == 'ontonotes':
@@ -495,6 +499,7 @@ def main():
     logger.info("Reading Data")
     datasets = {}
     for split in args.splits:
+        print("Splits are:",split)
         dataset = prepare_data.read_data_to_variable(args.data_paths[split], args.alphabets, args.device,
                                                      symbolic_root=True)
         datasets[split] = dataset
@@ -579,12 +584,13 @@ def main():
             print_results(test_eval_dict['in_domain'], 'test', args.domain, 'best_results')
             print('\n')
         for split in datasets.keys():
-            evaluation(args, datasets[split], split, best_model, args.domain, epoch, 'best_results')
+            eval_dict = evaluation(args, datasets[split], split, best_model, args.domain, epoch, 'best_results')
+            write_results(args, datasets[split], args.domain, split, model, args.domain, eval_dict)
 
     else:
         logger.info("Evaluating")
         epoch = start_epoch
-        for split in ['train', 'dev', 'test']:
+        for split in ['train', 'dev', 'test','poetry','prose']:
             eval_dict = evaluation(args, datasets[split], split, model, args.domain, epoch, 'best_results')
             write_results(args, datasets[split], args.domain, split, model, args.domain, eval_dict)
 
