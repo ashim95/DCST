@@ -4,15 +4,16 @@ If you use this code please cite our paper.
 ## Requirements
 Simply run:
 
-* Python 3.7 \
-* Pytorch 1.1.0 \
+* Python 3.7 
+* Pytorch 1.1.0 
 * Cuda 10.0 
 
 ```
 pip install -r requirements.txt
 ```
 ## Data
-Preprocessed in `note` format.
+Preprocessed in `note` format.  Data folder can be obtained from [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing).
+
 
 ## Multilingual Word Embeddings
 Embeddings can be found [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing)
@@ -32,10 +33,11 @@ Refer to corrsoponding section in `run_dcsh.sh` to run corrsopnding segments.
 
 ## Input settings:
 1. Without POS Tag       : Don't use flag `--use_pos` for all stages, namely, base model, auxiliary tasks, Final ensembled model.
-2. With Coarse level Tag : Use the input files from `data` folder from [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing) 
+2. With Coarse level Tag : Use the input files from `data` folder from with `--use_pos` flag [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing) 
 3. With POS level Tag    : Shuffle 2nd and 3rd column of all the files in  `data` folder.
 
 ## Mode : Average
+Use average of FastText, `case-layer` and `nos-layer` hidden representation as embedding.
 Set the `word_path="./data/cc.sanskrit.300.case.nos.vec"` or `cc.sanskrit.300.FT.case.nos.vec` or `cc.sanskrit.300.case.vec`. These files can be found [here](https://drive.google.com/drive/folders/15z28d-boFhhZMdriJZY4tNcZeHiL-naW?usp=sharing)
 
 ## Running the base Biaffine Parser
